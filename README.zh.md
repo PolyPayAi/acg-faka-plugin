@@ -1,5 +1,11 @@
 # ACG-Faka 的 PolyPay 支付插件
 
+[English](README.md) · **简体中文**
+
+新增 `app/Pay/PolyPay/` 支付模块及 `app/Plugin/PolyPayCallback/` 回调模块，不修改宿主已有文件、路由配置和数据库结构。支付后继续由宿主原生逻辑发货和充值。
+
+版本：**0.2.0 预览版；适配器测试已通过，尚待真实宿主验收。** 当前核对基准：ACG-Faka `ea4f4e6`（3.8.4）。
+
 ## 使用 AI 快速接入
 
 复制下面的提示词，发送给 Claude Code、Cursor、Codex 等 AI 编程工具：
@@ -12,12 +18,6 @@ https://github.com/PolyPayAi/acg-faka-plugin/tree/feat/standalone-payments/skill
 ```
 
 [查看 Skill 说明](skills/polypay-acg-faka/SKILL.md)
-
-## 插件概览
-
-新增 `app/Pay/PolyPay/` 支付模块及 `app/Plugin/PolyPayCallback/` 回调模块，不修改宿主已有文件、路由配置和数据库结构。支付后继续由宿主原生逻辑发货和充值。
-
-版本：**0.2.0 预览版；适配器测试已通过，尚待真实宿主验收。** 当前核对基准：ACG-Faka `ea4f4e6`（3.8.4）。完整说明见 [README](README.md)。
 
 ## 安装
 

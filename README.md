@@ -1,5 +1,11 @@
 # PolyPay for ACG-Faka
 
+**English** · [简体中文](README.zh.md)
+
+Native payment extension under `app/Pay/PolyPay/` and callback companion under `app/Plugin/PolyPayCallback/`. No existing host files or database schemas are changed. Uses PolyPay Hosted Checkout and the host's own order fulfillment and recharge services.
+
+Status: **0.2.0 preview — adapter tests passed; real host acceptance is still required.** Source compatibility reviewed against ACG-Faka `ea4f4e6` (version 3.8.4). Older branches and forks are not implicitly supported.
+
 ## Integrate with AI
 
 Paste this prompt into your AI coding tool (Claude Code, Cursor, Codex, etc.):
@@ -12,14 +18,6 @@ Then integrate PolyPay payments into this ACG-Faka project, configure the paymen
 ```
 
 [View the Skill guide](skills/polypay-acg-faka/SKILL.md)
-
-## Integration overview
-
-Native payment extension under `app/Pay/PolyPay/` and callback companion under `app/Plugin/PolyPayCallback/`. No existing host files or database schemas are changed. Uses PolyPay Hosted Checkout and the host's own order fulfillment and recharge services.
-
-Status: **0.2.0 preview — adapter tests passed; real host acceptance is still required.** Source compatibility reviewed against ACG-Faka `ea4f4e6` (version 3.8.4). Older branches and forks are not implicitly supported.
-
-[中文安装说明](README.zh.md)
 
 ## Requirements and installation
 
