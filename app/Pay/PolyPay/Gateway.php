@@ -79,7 +79,9 @@ class Gateway
     public function maintain(string $id, bool $cancel): array
     {
         return $this->store->locked($id, function (array $record) use ($id, $cancel): array {
-            if (empty($record['trade_id'])) throw new \RuntimeException('Unknown payment');
+            if (empty($record['trade_id']) || $record['merchant_id'] !== $this->config['merchant_id']
+                || $record['environment'] !== $this->config['environment']) throw new \RuntimeException('Unknown payment');
+            if ($record['state'] === 'paid') return ['state' => 'paid', 'fulfillment' => 'host_webhook'];
             $remote = ($this->api)('detail', ['trade_id' => $record['trade_id']]);
             if ($cancel && in_array($remote['status'] ?? null, [0, 1], true)) {
                 try { ($this->api)('cancel', ['trade_id' => $record['trade_id']]); }
