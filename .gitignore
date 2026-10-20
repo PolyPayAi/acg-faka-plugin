@@ -1,0 +1,5 @@
+/dist/
+/config.php
+/.env
+/storage/
+*.log
