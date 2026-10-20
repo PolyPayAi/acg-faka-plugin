@@ -1,0 +1,26 @@
+[
+  {
+    "plugin_key": "PolyPay",
+    "plugin_name": "PolyPay（预览版）",
+    "type": 1,
+    "group": 0,
+    "version": "0.2.0",
+    "description": "PolyPay托管收银台；须启用PolyPayCallback；仅生产环境，CNY转USD；关单不自动同步。",
+    "web_site": "https://github.com/PolyPayAi/acg-faka-plugin",
+    "price": "0",
+    "icon": "marketplace/icon.png",
+    "archive": "acg-faka-polypay-0.2.0-store-payment-install.zip"
+  },
+  {
+    "plugin_key": "PolyPayCallback",
+    "plugin_name": "PolyPay Callback（预览版）",
+    "type": 0,
+    "group": 0,
+    "version": "0.2.0",
+    "description": "PolyPay支付插件必需的回调模块；须配套安装PolyPay；支持原生订单发货和余额充值。",
+    "web_site": "https://github.com/PolyPayAi/acg-faka-plugin",
+    "price": "0",
+    "icon": "marketplace/icon.png",
+    "archive": "acg-faka-polypay-0.2.0-store-callback-install.zip"
+  }
+]

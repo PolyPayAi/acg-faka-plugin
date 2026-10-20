@@ -2,6 +2,8 @@
 
 版本：0.2.0 预览版。此文档用于准备上传，不表示已通过商店审核。
 
+预填条目在 `marketplace/listings.json`，默认免费，并明确标注预览版和配套依赖；120×120 图标为 `marketplace/icon.png`，使用现有 PolyPay 品牌图标。提交前先通过宿主 `/admin/api/app/service` 确认绑定账号的 `developer` 权限；权限为 0 时无法提交。
+
 | 商店条目 | 类型 | plugin_key | 首次安装包 | 升级包 |
 | --- | --- | --- | --- | --- |
 | PolyPay | 支付插件 / 1 | PolyPay | `*-store-payment-install.zip` | `*-store-payment-update.zip` |
