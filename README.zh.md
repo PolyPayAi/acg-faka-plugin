@@ -13,7 +13,7 @@
 5. 新增支付接口：插件选 `PolyPay`，支付标识填 `PolyPay`，按需启用商品购买及余额充值。
 6. 回调地址为宿主域名下的 `/plugin/PolyPayCallback/notification/callback.订单号?kind=order`（充值为 `kind=recharge`），通过宿主控制器约定自动加载，无需改路由配置。确保 HTTPS、WAF 和回调 IP 白名单允许 PolyPay 通知。
 
-内网测试可在配置档设置 `lan_http_origin=http://192.168.31.96:18081`，仅允许该私有 IPv4 地址及端口的 HTTP 回调和浏览器返回地址；留空时仍要求 HTTPS。PolyPay API 和收银台地址继续使用 HTTPS，Webhook 仍严格验证 production 签名。公网服务器无法直接回调内网地址，因此此配置只用于下单、跳转和返回测试，不能据此认定自动发货已验收；浏览器返回不会标记订单已支付。
+配置档提供「强制 HTTPS」（`force_https`）开关，默认开启。内网测试可关闭（`0`），允许商城回调和浏览器返回地址使用 HTTP，无需填写地址白名单；正式环境建议保持开启（`1`）。PolyPay API 和收银台地址继续使用 HTTPS，Webhook 仍严格验证 production 签名。公网服务器无法直接回调内网 IP，因此内网测试不能验证付款后的自动发货；浏览器返回不会标记订单已支付。旧的 `lan_http_origin` 设置已移除，升级后需要显式关闭 HTTPS 开关才能继续使用 HTTP。
 
 `storage_dir` 必须在网站根目录之外，持久保存且仅 PHP 进程和管理员可访问。仅支持单实例。备份时同时保留映射数据和宿主支付配置。真实凭据保存在宿主配置档，不写入本仓库。
 

@@ -31,8 +31,8 @@ class Gateway
     public function checkout(string $order, string $amount, string $notify, string $return): string
     {
         $amount = Support::amount($amount);
-        HostUrl::validate($notify, (string)($this->config['lan_http_origin'] ?? ''));
-        HostUrl::validate($return, (string)($this->config['lan_http_origin'] ?? ''));
+        HostUrl::validate($notify, ($this->config['force_https'] ?? 1));
+        HostUrl::validate($return, ($this->config['force_https'] ?? 1));
         $id = 'AC' . substr(hash('sha256', $this->config['merchant_id'] . '|' . $notify . '|' . $order), 0, 30);
         return $this->store->locked($id, function (array $record) use ($id, $order, $amount, $notify, $return): string {
             if ($record) {

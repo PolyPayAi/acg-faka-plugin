@@ -26,7 +26,7 @@ class Pay extends \App\Pay\Base implements \App\Pay\Pay
         }
         $gateway = new \App\Pay\PolyPay\Gateway($this->config);
         $parts = parse_url($this->callbackUrl);
-        \App\Pay\PolyPay\HostUrl::validate($this->callbackUrl, (string)($this->config['lan_http_origin'] ?? ''));
+        \App\Pay\PolyPay\HostUrl::validate($this->callbackUrl, ($this->config['force_https'] ?? 1));
         $kind = strpos($parts['path'] ?? '', '/rechargeNotification/') !== false ? 'recharge' : 'order';
         $origin = $parts['scheme'] . '://' . $parts['host'] . (isset($parts['port']) ? ':' . $parts['port'] : '');
         $callback = $origin . '/plugin/PolyPayCallback/notification/callback.' . rawurlencode($this->tradeNo) . '?kind=' . $kind;

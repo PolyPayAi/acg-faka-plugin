@@ -15,7 +15,7 @@ Status: **0.2.0 preview — adapter tests passed; real host acceptance is still 
 5. Add a payment interface with plugin `PolyPay`, payment code `PolyPay`, and enable product purchase and/or wallet recharge as desired. Give it the display name `PolyPay`.
 6. The adapter derives the callback origin from the host and uses its new controller at `/plugin/PolyPayCallback/notification/callback.HOST_ORDER?kind=order` (or `kind=recharge`). The host convention resolves the new controller automatically; no route file is edited. Keep this endpoint accessible over HTTPS, including configured callback IP whitelist/WAF policy.
 
-For LAN testing, set `lan_http_origin=http://192.168.31.96:18081` in the payment profile. Only HTTP callbacks and browser returns on that exact RFC1918 IPv4 host and port are accepted. Leave it empty for the HTTPS default. PolyPay API and checkout URLs remain HTTPS, with production webhook verification unchanged. Public servers cannot directly deliver webhooks to the LAN address; test order creation, redirects and returns only. This does not verify automatic fulfillment, and browser returns never mark orders paid.
+The payment profile provides a Force HTTPS (`force_https`) switch, enabled by default. Disable it (`0`) for LAN testing to permit HTTP storefront callback and return URLs without an origin allowlist. Keep it enabled (`1`) for production. PolyPay API and checkout URLs remain HTTPS, with production webhook verification unchanged. Public servers cannot directly deliver webhooks to a LAN IP, so LAN testing does not verify automatic fulfillment; browser returns never mark orders paid. The old `lan_http_origin` setting has been removed. After upgrading, explicitly disable Force HTTPS to continue HTTP testing.
 
 The private store must be writable by the PHP worker and persist across upgrades. Back up it and the host payment configuration together. Use one instance; independently scaled stores are not supported. Restrict direct HTTP access to the host's `app/` directory as required by its deployment guide.
 
@@ -57,7 +57,7 @@ php tests/run.php
 php tests/controller.php  # PHP 8+ host HTTP boundary tests
 php tests/trade.php
 php tests/checkout-errors.php
-php tests/lan-http.php
+php tests/https-switch.php
 python3 tests/package.py  # extraction, update preservation and secret exclusion
 python3 scripts/package.py
 ```

@@ -4,5 +4,5 @@ return [
     ['title' => 'Merchant ID', 'name' => 'merchant_id', 'type' => 'input', 'required' => true],
     ['title' => 'USD per CNY', 'name' => 'usd_rate', 'type' => 'input', 'required' => true],
     ['title' => 'Private storage directory (absolute path)', 'name' => 'storage_dir', 'type' => 'input', 'required' => true],
-    ['title' => 'LAN HTTP origin (testing only; leave empty in production)', 'name' => 'lan_http_origin', 'type' => 'input', 'required' => false],
+    ['title' => 'Force HTTPS', 'name' => 'force_https', 'type' => 'switch', 'default' => 1],
 ];
