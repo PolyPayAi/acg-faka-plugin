@@ -19,7 +19,7 @@ class Signature implements \App\Pay\Signature
     public function verifyRequest(string $body, array $headers, array $config, ?\PolyPay\WebhookPublicKeyProviderInterface $keys = null): array
     {
         $gateway = new \App\Pay\PolyPay\Gateway($config);
-        $verifier = new \PolyPay\WebhookV2Handler($config['merchant_id'], $config['environment'],
+        $verifier = new \PolyPay\WebhookV2Handler($config['merchant_id'], 'production',
             new \PolyPay\Nonce\FileNonceStorage($config['storage_dir'] . '/nonces'), $keys);
         return $gateway->accept($verifier->verify($body, $headers));
     }

@@ -7,7 +7,7 @@ function check(bool $value, string $message): void { if (!$value) throw new Runt
 /** Require an invalid input or transition to fail. */
 function rejects(callable $action): void { try { $action(); } catch (Throwable $error) { return; } throw new RuntimeException('Expected rejection'); }
 $dir = sys_get_temp_dir() . '/polypay-acg-test-' . bin2hex(random_bytes(8));
-$config = ['api_key' => 'fixture-only', 'merchant_id' => 'MCH_TEST', 'environment' => 'sandbox', 'usd_rate' => '0.14', 'storage_dir' => $dir];
+$config = ['api_key' => 'fixture-only', 'merchant_id' => 'MCH_TEST', 'environment' => 'production', 'usd_rate' => '0.14', 'storage_dir' => $dir];
 $creates = 0; $id = ''; $remoteStatus = 1;
 $api = function ($op, $params) use (&$creates, &$id, &$remoteStatus): array {
     if ($op === 'checkout') {
@@ -21,7 +21,7 @@ $api = function ($op, $params) use (&$creates, &$id, &$remoteStatus): array {
 $gateway = new Gateway($config, $api);
 $url = $gateway->checkout('123456', '10.00', 'https://shop.example/user/api/order/callback.123456', 'https://shop.example/order');
 check($gateway->checkout('123456', '10.00', 'https://shop.example/user/api/order/callback.123456', 'https://shop.example/order') === $url && $creates === 1, 'Native retry');
-$event = ['order_no' => $id, 'status' => 2, 'fiat_amount' => '1.40', 'environment' => 'sandbox', 'event_id' => 'evt1'];
+$event = ['order_no' => $id, 'status' => 2, 'fiat_amount' => '1.40', 'environment' => 'production', 'event_id' => 'evt1'];
 $bad = $event; $bad['fiat_amount'] = '10.00'; rejects(function () use ($gateway, $bad) { $gateway->accept($bad); });
 $bad = $event; $bad['status'] = 5; rejects(function () use ($gateway, $bad) { $gateway->accept($bad); });
 $changed = $config; $changed['usd_rate'] = '0.20';
@@ -44,10 +44,10 @@ $keys = new class($public) implements \PolyPay\WebhookPublicKeyProviderInterface
     public function getPublicKey(string $id): string { if ($id !== 'test') throw new RuntimeException('Unknown key'); return $this->key; }
 };
 $body = json_encode($event); $timestamp = (string)time(); $nonce = bin2hex(random_bytes(16));
-$payload = implode("\n", ['polypay-webhook-v2', 'test', $timestamp, $nonce, 'MCH_TEST', 'sandbox', $body]);
+$payload = implode("\n", ['polypay-webhook-v2', 'test', $timestamp, $nonce, 'MCH_TEST', 'production', $body]);
 $signature = rtrim(strtr(base64_encode(sodium_crypto_sign_detached($payload, $secret)), '+/', '-_'), '=');
 $headers = ['X-Webhook-Signature-Version' => 'v2', 'X-Webhook-Key-Id' => 'test', 'X-Timestamp' => $timestamp,
-    'X-Nonce' => $nonce, 'X-Webhook-Merchant-Id' => 'MCH_TEST', 'X-Webhook-Environment' => 'sandbox', 'X-Webhook-Signature-V2' => $signature];
+    'X-Nonce' => $nonce, 'X-Webhook-Merchant-Id' => 'MCH_TEST', 'X-Webhook-Environment' => 'production', 'X-Webhook-Signature-V2' => $signature];
 $adapter = new \App\Pay\PolyPay\Impl\Signature();
 rejects(function () use ($adapter, $body, $headers, $config, $keys) { $adapter->verifyRequest($body . ' ', $headers, $config, $keys); });
 check($adapter->verifyRequest($body, $headers, $config, $keys) === $normalized, 'Native signed payload mapping');

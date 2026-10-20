@@ -2,13 +2,13 @@
 
 新增 `app/Pay/PolyPay/` 及一个 `app/Controller/User/Api/PolyPayNotification.php` 文件，不修改宿主已有文件、路由配置和数据库结构。支付后继续由宿主原生逻辑发货和充值。
 
-版本：**0.1.0 预览版；适配器测试已通过，尚待真实宿主和 Sandbox 验收。** 当前核对基准：ACG-Faka `ea4f4e6`（3.8.4）。完整说明见 [README](README.md)。
+版本：**0.1.0 预览版；适配器测试已通过，尚待真实宿主验收。** 当前核对基准：ACG-Faka `ea4f4e6`（3.8.4）。完整说明见 [README](README.md)。
 
 ## 安装
 
 1. 在宿主 PHP 8+ 环境启用 curl、json、bcmath、sodium。
 2. 解压安装包，将新的 `app/Pay/PolyPay/` 和 `app/Controller/User/Api/PolyPayNotification.php` 复制到宿主对应位置。如果目标已存在，应先停止安装并核对归属，不能直接覆盖。无需修改宿主 Composer。
-3. 后台「支付插件」配置 PolyPay：API Key、商户 ID、环境（`sandbox` / `production`）、`usd_rate` 和私有存储绝对路径 `storage_dir`。先使用 Sandbox API Key 和对应环境。
+3. 后台「支付插件」配置 PolyPay：API Key、商户 ID、`usd_rate` 和私有存储绝对路径 `storage_dir`。Webhook 固定校验 production 环境，插件不提供 Sandbox 模式。
 4. 当前核对的宿主向插件提交 CNY 网关金额；`usd_rate` 是每 1 CNY 折合多少 USD，例如 `0.14`。其他版本需先验证传入金额含义，避免二次换算。
 5. 新增支付接口：插件选 `PolyPay`，支付标识填 `PolyPay`，按需启用商品购买及余额充值。
 6. 回调地址为宿主域名下的 `/user/api/polyPayNotification/callback.订单号?kind=order`（充值为 `kind=recharge`），通过宿主控制器约定自动加载，无需改路由配置。确保 HTTPS、WAF 和回调 IP 白名单允许 PolyPay 通知。
@@ -42,6 +42,6 @@ php bin/payment.php cancel AC商户订单号
 
 ## 验证
 
-执行 `php tests/run.php`、`python3 scripts/package.py`。正式使用前，必须在实际宿主完成 Sandbox 商品购买、余额充值、一次发货/到账、重复和非法回调、金额不符、汇率变更、过期、取消竞争及迟到付款测试。当前不宣称真实端到端联调通过。
+执行 `php tests/run.php`、`python3 scripts/package.py`。正式使用前，先验证真实接口下单和取消，不进行付款；经明确授权的小额真实付款后，再验证商品购买、余额充值、一次发货/到账、重复和非法回调、金额不符、汇率变更、过期、取消竞争及迟到付款测试。当前不宣称真实端到端联调通过。
 
 当前 PolyPay 后端插件类型白名单尚无本平台，因此本预览版不会调用插件激活接口。

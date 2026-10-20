@@ -17,10 +17,10 @@ class Gateway
     /** Bind the native adapter to one merchant and a private durable snapshot store. */
     public function __construct(array $config, ?callable $api = null)
     {
-        foreach (['api_key', 'merchant_id', 'environment', 'usd_rate', 'storage_dir'] as $key) {
+        foreach (['api_key', 'merchant_id', 'usd_rate', 'storage_dir'] as $key) {
             if (!is_string($config[$key] ?? null) || $config[$key] === '') throw new \RuntimeException('Configure PolyPay ' . $key);
         }
-        if (!in_array($config['environment'], ['sandbox', 'production'], true)) throw new \RuntimeException('Invalid PolyPay environment');
+        $config['environment'] = 'production';
         $this->config = $config;
         $this->store = new Store($config['storage_dir']);
         $this->api = $api ?? [new Api($config['api_key']), 'request'];

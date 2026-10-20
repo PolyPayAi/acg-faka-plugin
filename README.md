@@ -2,7 +2,7 @@
 
 Native payment extension under `app/Pay/PolyPay/`, plus one new controller file `app/Controller/User/Api/PolyPayNotification.php`. No existing host files or database schemas are changed. Uses PolyPay Hosted Checkout and the host's own order fulfillment and recharge services.
 
-Status: **0.1.0 preview — adapter tests passed; real host/Sandbox acceptance is still required.** Source compatibility reviewed against ACG-Faka `ea4f4e6` (version 3.8.4). Older branches and forks are not implicitly supported.
+Status: **0.1.0 preview — adapter tests passed; real host acceptance is still required.** Source compatibility reviewed against ACG-Faka `ea4f4e6` (version 3.8.4). Older branches and forks are not implicitly supported.
 
 [中文安装说明](README.zh.md)
 
@@ -10,7 +10,7 @@ Status: **0.1.0 preview — adapter tests passed; real host/Sandbox acceptance i
 
 1. Use a compatible ACG-Faka installation with curl, json, bcmath and sodium enabled in its PHP runtime. PHP 8+ is required by the host.
 2. Extract the release and copy the new `app/Pay/PolyPay/` directory and `app/Controller/User/Api/PolyPayNotification.php` into the corresponding host paths. Stop if either target already exists; do not overwrite existing files. All SDK dependencies are bundled; no host Composer changes are required.
-3. Open payment plugin settings in the host admin and configure PolyPay: API Key, expected merchant ID, `environment` (`sandbox` or `production`), `usd_rate` (USD per CNY), and an absolute private `storage_dir` outside the public document root. Start with a Sandbox API Key and matching environment. Do not put real credentials into this repository's `Config.php`.
+3. Open payment plugin settings in the host admin and configure PolyPay: API Key, expected merchant ID, `usd_rate` (USD per CNY), and an absolute private `storage_dir` outside the public document root. Webhook verification requires the signed production audience. Do not put real credentials into this repository's `Config.php`.
 4. The inspected host submits its CNY gateway amount even when the storefront uses another display currency. For example `usd_rate=0.14` converts CNY 10 to USD 1.40. Check this assumption on your exact version. The adapter persists the original gateway amount and USD conversion before calling PolyPay.
 5. Add a payment interface with plugin `PolyPay`, payment code `PolyPay`, and enable product purchase and/or wallet recharge as desired. Give it the display name `PolyPay`.
 6. The adapter derives the callback origin from the host and uses its new controller at `/user/api/polyPayNotification/callback.HOST_ORDER?kind=order` (or `kind=recharge`). The host convention resolves the new controller automatically; no route file is edited. Keep this endpoint accessible over HTTPS, including configured callback IP whitelist/WAF policy.
@@ -61,6 +61,6 @@ php tests/controller.php  # PHP 8+ host HTTP boundary tests
 python3 scripts/package.py
 ```
 
-Tests mock API calls and never charge real funds. Before production, create a real Sandbox order on your installed host, verify a signed callback and exactly one product delivery / wallet credit, then test duplicate/invalid signatures, wrong amounts, changed rates, expired orders, cancellation races and late payments. This release has not completed real host/Sandbox end-to-end acceptance.
+Tests mock API calls and never charge real funds. Before enabling customer traffic, verify order creation and cancellation without payment. With explicit authorization for a small real payment, verify a signed callback and exactly one product delivery / wallet credit, then test duplicate/invalid signatures, wrong amounts, changed rates, expired orders, cancellation races and late payments. This release has not completed real host end-to-end acceptance.
 
 `Vendor/polypay` is the unmodified official PolyPay PHP SDK snapshot `d4f152b85bdd7c7ac210ded8a13eeecd8e3a9e09` from https://github.com/PolyPayAi/php-sdk, distributed with its MIT license. The snapshot is used for v2 verification. Canonical order HTTP calls preserve the complete checkout/trade mapping. `Support.php` is vendored from the companion Dujiao-Next bridge; update both copies together. Installation does not call PolyPay plugin activation: the current backend plugin-type allowlist does not include this platform yet.
