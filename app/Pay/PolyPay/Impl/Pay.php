@@ -8,6 +8,17 @@ class Pay extends \App\Pay\Base implements \App\Pay\Pay
     /** Return a native redirect payment entity; the host retains inventory and fulfillment. */
     public function trade(): \App\Entity\PayEntity
     {
+        try {
+            return $this->checkout();
+        } catch (\InvalidArgumentException $error) {
+            // Expected input errors must use the host's JSON boundary, not its HTTP 500 HTML page.
+            throw new \Kernel\Exception\JSONException('PolyPay: ' . $error->getMessage(), 0, $error);
+        }
+    }
+
+    /** Validate the payment setup and build the hosted checkout redirect. */
+    private function checkout(): \App\Entity\PayEntity
+    {
         $companion = \Kernel\Util\Plugin::getPlugin('PolyPayCallback', false);
         if ((int)($companion['PLUGIN_CONFIG']['STATUS'] ?? 0) !== 1
             || !class_exists(\App\Plugin\PolyPayCallback\Controller\Notification::class)) {
