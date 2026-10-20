@@ -17,6 +17,21 @@ Status: **0.1.0 preview — adapter tests passed; real host/Sandbox acceptance i
 
 The private store must be writable by the PHP worker and persist across upgrades. Back up it and the host payment configuration together. Use one instance; independently scaled stores are not supported. Restrict direct HTTP access to the host's `app/` directory as required by its deployment guide.
 
+## Docker deployment
+
+On the reviewed ACG-Faka Docker image, `/var/www/html/app/Pay` is a symlink to the persistent `/data/pay` directory. Copy `PolyPay/` into that volume rather than mounting over the symlink. Use `/data/polypay-storage` for the private mapping directory, owned by the PHP worker (UID 33) with mode 0700.
+
+The additional controller is outside that volume. Persist it with a read-only bind mount in a separate Compose override, then recreate only the app service:
+
+```yaml
+services:
+  app:
+    volumes:
+      - /opt/acg-faka-plugin/app/Controller/User/Api/PolyPayNotification.php:/var/www/html/app/Controller/User/Api/PolyPayNotification.php:ro
+```
+
+Retain the original Compose files and environment file when applying this override. Do not rely on `docker cp` into the app container for the controller: it would disappear on recreation. This deployment changes container mounts and adds plugin files; it does not edit the host source repository or alter database structure.
+
 ## Payment integrity
 
 The server calls canonical merchant endpoints to create Hosted Checkout and query the PolyPay trade ID. The buyer selects payment methods on PolyPay. The official bundled PHP SDK verifies strict Ed25519 Webhook v2, its merchant/environment audience, freshness and replay protection. Only paid status 2 or admin-marked-paid status 7 is accepted; manual recharge status 5 does not authorize an ordinary purchase.

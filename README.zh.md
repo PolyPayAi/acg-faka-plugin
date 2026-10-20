@@ -15,6 +15,12 @@
 
 `storage_dir` 必须在网站根目录之外，持久保存且仅 PHP 进程和管理员可访问。仅支持单实例。备份时同时保留映射数据和宿主支付配置。真实凭据保存在宿主配置档，不写入本仓库。
 
+## Docker 部署
+
+当前核对的镜像中，`app/Pay` 软链到持久化目录 `/data/pay`。将插件目录复制到 `/data/pay/PolyPay`，私有映射目录使用 `/data/polypay-storage`，所有者为 PHP 用户 UID 33，目录权限 0700。
+
+新增控制器不在该数据卷中，需要通过独立 Compose override 只读挂载插件仓库的 `app/Controller/User/Api/PolyPayNotification.php` 到容器对应位置；应用 override 时保留原 Compose 文件及环境文件，只重建 app 服务。不要仅用 `docker cp` 放进容器，否则重建后控制器会丢失。具体挂载示例见英文 README。宿主源码仓库及数据库结构不需要改动。
+
 ## 支付校验
 
 下单前保存原始 CNY 网关金额、USD 金额和汇率快照。买家在 PolyPay 托管收银台选择支付方式。使用随包附带的官方 SDK 验证 Webhook v2 的签名、商户、环境、时间和 nonce；只将状态 2、7 视为已付款。
