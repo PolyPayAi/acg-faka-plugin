@@ -3,6 +3,7 @@ namespace App\Pay\PolyPay;
 
 require_once __DIR__ . '/Vendor/polypay/autoload.php';
 require_once __DIR__ . '/Support.php';
+require_once __DIR__ . '/HostUrl.php';
 
 use PolyPayPlugin\Support;
 use PolyPayPlugin\Store;
@@ -30,8 +31,8 @@ class Gateway
     public function checkout(string $order, string $amount, string $notify, string $return): string
     {
         $amount = Support::amount($amount);
-        Support::url($notify);
-        Support::url($return);
+        HostUrl::validate($notify, (string)($this->config['lan_http_origin'] ?? ''));
+        HostUrl::validate($return, (string)($this->config['lan_http_origin'] ?? ''));
         $id = 'AC' . substr(hash('sha256', $this->config['merchant_id'] . '|' . $notify . '|' . $order), 0, 30);
         return $this->store->locked($id, function (array $record) use ($id, $order, $amount, $notify, $return): string {
             if ($record) {

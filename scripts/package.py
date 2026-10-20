@@ -13,7 +13,7 @@ CALLBACK = Path('app/Plugin/PolyPayCallback')
 def source_files(base):
     """Select code and licenses; configuration is generated separately."""
     names = (
-        ['Config/Info.php', 'Config/Submit.php', 'Gateway.php', 'Support.php', 'Impl/Pay.php', 'Impl/Signature.php']
+        ['Config/Info.php', 'Config/Submit.php', 'Gateway.php', 'Support.php', 'HostUrl.php', 'Impl/Pay.php', 'Impl/Signature.php']
         if base == PAY else ['Config/Info.php', 'Config/Submit.php', 'Controller/Notification.php']
     )
     candidates = [ROOT / base / name for name in names]
