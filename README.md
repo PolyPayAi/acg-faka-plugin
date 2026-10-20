@@ -1,26 +1,17 @@
 # PolyPay for ACG-Faka
 
-## AI-assisted setup (Skill)
+## Integrate with AI
 
-Use the bundled [polypay-acg-faka skill](skills/polypay-acg-faka/SKILL.md) with Codex to install, configure, upgrade, or troubleshoot this integration. It installs both the PolyPay payment extension and the PolyPayCallback companion.
-
-Install with Codex’s built-in skill installer:
-
-```bash
-python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-installer/scripts/install-skill-from-github.py" \
-  --repo PolyPayAi/acg-faka-plugin \
-  --ref feat/standalone-payments \
-  --path skills/polypay-acg-faka
-```
-
-The skill is currently on `feat/standalone-payments`; keep the `--ref` argument. If already installed, review the existing skill before replacing it. On your next Codex turn, invoke it with the actual local paths:
+Paste this prompt into your AI coding tool (Claude Code, Cursor, Codex, etc.):
 
 ```text
-$polypay-acg-faka
-Install and configure PolyPay in /path/to/acg-faka. Plugin source is at /path/to/acg-faka-plugin. Read merchant credentials from the private file I specify. Enable both modules, import panel language packs, and verify checkout creation and cancellation without paying.
+Install and use the PolyPay integration Skill for ACG-Faka:
+https://github.com/PolyPayAi/acg-faka-plugin/tree/feat/standalone-payments/skills/polypay-acg-faka
+
+Then integrate PolyPay payments into this ACG-Faka project, configure the payment and callback plugins, and verify checkout creation and cancellation.
 ```
 
-For another AI tool, ask it to read the linked `SKILL.md` first. The skill is operational guidance; it does not install the payment integration merely by being added to Codex.
+[View the Skill guide](skills/polypay-acg-faka/SKILL.md)
 
 ## Integration overview
 
