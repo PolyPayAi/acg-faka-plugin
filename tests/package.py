@@ -37,6 +37,13 @@ with tempfile.TemporaryDirectory() as work:
                 assert 'app/Plugin/PolyPayCallback/Controller/Notification.php' in archive.namelist()
                 continue
             assert 'Config/Info.php' in archive.namelist()
+            for lang in ('zh-cn', 'zh-tw', 'en', 'ja'):
+                name = 'Lang/' + lang + '.json'
+                assert name in archive.namelist()
+                pack = json.loads(archive.read(name))
+                assert pack and all(isinstance(value, str) and value.strip() for value in pack.values())
+                if item['type'] == 1:
+                    assert {'API 密钥', '商户编号', '每 1 CNY 折合 USD', '私有存储目录（绝对路径）', '强制 HTTPS'} <= set(pack)
             assert not any(n.startswith('app/') for n in archive.namelist())
             target = destinations[item['type']]
             if item['mode'] == 'install':

@@ -17,6 +17,7 @@ def source_files(base):
         if base == PAY else ['Config/Info.php', 'Config/Submit.php', 'Controller/Notification.php']
     )
     candidates = [ROOT / base / name for name in names]
+    candidates += [ROOT / base / 'Lang' / (lang + '.json') for lang in ('zh-cn', 'zh-tw', 'en', 'ja')]
     if base == PAY:
         vendor = ROOT / base / 'Vendor/polypay'
         candidates += [vendor / 'autoload.php', vendor / 'LICENSE']

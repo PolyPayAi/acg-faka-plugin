@@ -19,6 +19,10 @@ The payment profile provides a Force HTTPS (`force_https`) switch, enabled by de
 
 The private store must be writable by the PHP worker and persist across upgrades. Back up it and the host payment configuration together. Use one instance; independently scaled stores are not supported. Restrict direct HTTP access to the host's `app/` directory as required by its deployment guide.
 
+## Panel language
+
+Configuration labels and extension descriptions follow the host panel language. Bundled native `Lang/*.json` packs cover Simplified Chinese, Traditional Chinese, English and Japanese. Store installation imports the packs through the host mechanism. After manual copying, run the host `Kernel\Util\Lang::scanExtensionPacks()` to import packs and rebuild dictionaries, then refresh the panel. Switching languages never changes configuration field names, API Keys or merchant settings.
+
 ## Docker deployment
 
 On the reviewed ACG-Faka Docker image, `/var/www/html/app/Pay` is a symlink to the persistent `/data/pay` directory. Copy `PolyPay/` into that volume rather than mounting over the symlink. Use `/data/polypay-storage` for the private mapping directory, owned by the PHP worker (UID 33) with mode 0700.
