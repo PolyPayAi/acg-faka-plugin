@@ -29,7 +29,7 @@ namespace App\Model {
 }
 namespace {
     require_once dirname(__DIR__) . '/app/Pay/PolyPay/Vendor/polypay/autoload.php';
-    require_once dirname(__DIR__) . '/app/Controller/User/Api/PolyPayNotification.php';
+    require_once dirname(__DIR__) . '/app/Plugin/PolyPayCallback/Controller/Notification.php';
     $service = new class implements \App\Service\Order, \App\Service\Recharge {
         public string $mode = 'success';
         /** Simulate native verification and transactional outcomes independently. */
@@ -44,7 +44,7 @@ namespace {
     $request = new class implements \Kernel\Context\Interface\Request {
         /** Return a raw PolyPay JSON event. */ public function raw(): string { return '{"status":2}'; }
     };
-    $controller = new \App\Controller\User\Api\PolyPayNotification();
+    $controller = new \App\Plugin\PolyPayCallback\Controller\Notification();
     foreach (['order', 'recharge'] as $property) {
         $reflection = new \ReflectionProperty($controller, $property);
         $reflection->setAccessible(true); $reflection->setValue($controller, $service);

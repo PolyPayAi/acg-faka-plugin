@@ -13,9 +13,10 @@ jobs:
           extensions: curl, bcmath, sodium
           coverage: none
       - run: find . -name '*.php' -not -path './.git/*' -print0 | xargs -0 -n 1 php -l
-      - run: php tests/run.php && php tests/controller.php
+      - run: php tests/run.php && php tests/controller.php && php tests/trade.php
+      - run: python3 tests/package.py
       - run: python3 scripts/package.py
       - uses: actions/upload-artifact@v4
         with:
           name: plugin-install-archive
-          path: dist/*.zip
+          path: dist/

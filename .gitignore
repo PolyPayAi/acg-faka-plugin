@@ -3,3 +3,5 @@
 /.env
 /storage/
 *.log
+
+__pycache__/

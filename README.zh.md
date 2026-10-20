@@ -1,17 +1,17 @@
 # ACG-Faka 的 PolyPay 支付插件
 
-新增 `app/Pay/PolyPay/` 及一个 `app/Controller/User/Api/PolyPayNotification.php` 文件，不修改宿主已有文件、路由配置和数据库结构。支付后继续由宿主原生逻辑发货和充值。
+新增 `app/Pay/PolyPay/` 支付模块及 `app/Plugin/PolyPayCallback/` 回调模块，不修改宿主已有文件、路由配置和数据库结构。支付后继续由宿主原生逻辑发货和充值。
 
-版本：**0.1.0 预览版；适配器测试已通过，尚待真实宿主验收。** 当前核对基准：ACG-Faka `ea4f4e6`（3.8.4）。完整说明见 [README](README.md)。
+版本：**0.2.0 预览版；适配器测试已通过，尚待真实宿主验收。** 当前核对基准：ACG-Faka `ea4f4e6`（3.8.4）。完整说明见 [README](README.md)。
 
 ## 安装
 
 1. 在宿主 PHP 8+ 环境启用 curl、json、bcmath、sodium。
-2. 解压安装包，将新的 `app/Pay/PolyPay/` 和 `app/Controller/User/Api/PolyPayNotification.php` 复制到宿主对应位置。如果目标已存在，应先停止安装并核对归属，不能直接覆盖。无需修改宿主 Composer。
+2. 解压 `manual-install` 安装包，将两个模块目录复制到宿主对应位置；在后台「插件管理」启用 PolyPay Callback 后再配置支付。如果目标已存在，应先停止安装并核对归属，不能直接覆盖。无需修改宿主 Composer。
 3. 后台「支付插件」配置 PolyPay：API Key、商户 ID、`usd_rate` 和私有存储绝对路径 `storage_dir`。Webhook 固定校验 production 环境，插件不提供 Sandbox 模式。
 4. 当前核对的宿主向插件提交 CNY 网关金额；`usd_rate` 是每 1 CNY 折合多少 USD，例如 `0.14`。其他版本需先验证传入金额含义，避免二次换算。
 5. 新增支付接口：插件选 `PolyPay`，支付标识填 `PolyPay`，按需启用商品购买及余额充值。
-6. 回调地址为宿主域名下的 `/user/api/polyPayNotification/callback.订单号?kind=order`（充值为 `kind=recharge`），通过宿主控制器约定自动加载，无需改路由配置。确保 HTTPS、WAF 和回调 IP 白名单允许 PolyPay 通知。
+6. 回调地址为宿主域名下的 `/plugin/PolyPayCallback/notification/callback.订单号?kind=order`（充值为 `kind=recharge`），通过宿主控制器约定自动加载，无需改路由配置。确保 HTTPS、WAF 和回调 IP 白名单允许 PolyPay 通知。
 
 `storage_dir` 必须在网站根目录之外，持久保存且仅 PHP 进程和管理员可访问。仅支持单实例。备份时同时保留映射数据和宿主支付配置。真实凭据保存在宿主配置档，不写入本仓库。
 
@@ -19,7 +19,11 @@
 
 当前核对的镜像中，`app/Pay` 软链到持久化目录 `/data/pay`。将插件目录复制到 `/data/pay/PolyPay`，私有映射目录使用 `/data/polypay-storage`，所有者为 PHP 用户 UID 33，目录权限 0700。
 
-新增控制器不在该数据卷中，需要通过独立 Compose override 只读挂载插件仓库的 `app/Controller/User/Api/PolyPayNotification.php` 到容器对应位置；应用 override 时保留原 Compose 文件及环境文件，只重建 app 服务。不要仅用 `docker cp` 放进容器，否则重建后控制器会丢失。具体挂载示例见英文 README。宿主源码仓库及数据库结构不需要改动。
+回调模块放在宿主已持久化的 `app/Plugin/PolyPayCallback` 目录（当前镜像为 `/data/plugins/PolyPayCallback`）。两个目录都随数据卷保留，无需额外控制器挂载。升级 0.1.0 时暂留旧回调控制器以处理旧订单。
+
+## 应用商店交付
+
+商店需要分别登记支付插件 `PolyPay`（类型 1）和通用插件 `PolyPayCallback`（类型 0）。`scripts/package.py` 生成两个模块各自的首次安装包、升级包，以及手动安装/升级整包。商店包直接从 `Config/` 开始；升级包不含配置，不覆盖已有商户设置。首次安装包中的配置由打包脚本生成，不读取本机配置。具体包名、提交流程及升级步骤见 [MARKETPLACE.md](MARKETPLACE.md)。
 
 ## 支付校验
 
@@ -42,6 +46,6 @@ php bin/payment.php cancel AC商户订单号
 
 ## 验证
 
-执行 `php tests/run.php`、`python3 scripts/package.py`。正式使用前，先验证真实接口下单和取消，不进行付款；经明确授权的小额真实付款后，再验证商品购买、余额充值、一次发货/到账、重复和非法回调、金额不符、汇率变更、过期、取消竞争及迟到付款测试。当前不宣称真实端到端联调通过。
+执行 `php tests/run.php`、`php tests/controller.php`、`php tests/trade.php`、`python3 tests/package.py`、`python3 scripts/package.py`。正式使用前，先验证真实接口下单和取消，不进行付款；经明确授权的小额真实付款后，再验证商品购买、余额充值、一次发货/到账、重复和非法回调、金额不符、汇率变更、过期、取消竞争及迟到付款测试。当前不宣称真实端到端联调通过。
 
 当前 PolyPay 后端插件类型白名单尚无本平台，因此本预览版不会调用插件激活接口。

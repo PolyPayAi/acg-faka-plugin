@@ -1,19 +1,19 @@
 # PolyPay for ACG-Faka
 
-Native payment extension under `app/Pay/PolyPay/`, plus one new controller file `app/Controller/User/Api/PolyPayNotification.php`. No existing host files or database schemas are changed. Uses PolyPay Hosted Checkout and the host's own order fulfillment and recharge services.
+Native payment extension under `app/Pay/PolyPay/` and callback companion under `app/Plugin/PolyPayCallback/`. No existing host files or database schemas are changed. Uses PolyPay Hosted Checkout and the host's own order fulfillment and recharge services.
 
-Status: **0.1.0 preview — adapter tests passed; real host acceptance is still required.** Source compatibility reviewed against ACG-Faka `ea4f4e6` (version 3.8.4). Older branches and forks are not implicitly supported.
+Status: **0.2.0 preview — adapter tests passed; real host acceptance is still required.** Source compatibility reviewed against ACG-Faka `ea4f4e6` (version 3.8.4). Older branches and forks are not implicitly supported.
 
 [中文安装说明](README.zh.md)
 
 ## Requirements and installation
 
 1. Use a compatible ACG-Faka installation with curl, json, bcmath and sodium enabled in its PHP runtime. PHP 8+ is required by the host.
-2. Extract the release and copy the new `app/Pay/PolyPay/` directory and `app/Controller/User/Api/PolyPayNotification.php` into the corresponding host paths. Stop if either target already exists; do not overwrite existing files. All SDK dependencies are bundled; no host Composer changes are required.
+2. Extract the `manual-install` archive and copy both extension directories into the host. Enable PolyPay Callback in plugin management before configuring payments. Stop if either target already exists; do not overwrite existing files. All SDK dependencies are bundled; no host Composer changes are required.
 3. Open payment plugin settings in the host admin and configure PolyPay: API Key, expected merchant ID, `usd_rate` (USD per CNY), and an absolute private `storage_dir` outside the public document root. Webhook verification requires the signed production audience. Do not put real credentials into this repository's `Config.php`.
 4. The inspected host submits its CNY gateway amount even when the storefront uses another display currency. For example `usd_rate=0.14` converts CNY 10 to USD 1.40. Check this assumption on your exact version. The adapter persists the original gateway amount and USD conversion before calling PolyPay.
 5. Add a payment interface with plugin `PolyPay`, payment code `PolyPay`, and enable product purchase and/or wallet recharge as desired. Give it the display name `PolyPay`.
-6. The adapter derives the callback origin from the host and uses its new controller at `/user/api/polyPayNotification/callback.HOST_ORDER?kind=order` (or `kind=recharge`). The host convention resolves the new controller automatically; no route file is edited. Keep this endpoint accessible over HTTPS, including configured callback IP whitelist/WAF policy.
+6. The adapter derives the callback origin from the host and uses its new controller at `/plugin/PolyPayCallback/notification/callback.HOST_ORDER?kind=order` (or `kind=recharge`). The host convention resolves the new controller automatically; no route file is edited. Keep this endpoint accessible over HTTPS, including configured callback IP whitelist/WAF policy.
 
 The private store must be writable by the PHP worker and persist across upgrades. Back up it and the host payment configuration together. Use one instance; independently scaled stores are not supported. Restrict direct HTTP access to the host's `app/` directory as required by its deployment guide.
 
@@ -21,16 +21,11 @@ The private store must be writable by the PHP worker and persist across upgrades
 
 On the reviewed ACG-Faka Docker image, `/var/www/html/app/Pay` is a symlink to the persistent `/data/pay` directory. Copy `PolyPay/` into that volume rather than mounting over the symlink. Use `/data/polypay-storage` for the private mapping directory, owned by the PHP worker (UID 33) with mode 0700.
 
-The additional controller is outside that volume. Persist it with a read-only bind mount in a separate Compose override, then recreate only the app service:
+The callback companion resides in the host's persistent plugin directory (`/data/plugins/PolyPayCallback` on the reviewed image). Both components persist in the data volume; no controller bind mount is required. When upgrading from 0.1.0, retain its old controller until outstanding callbacks have drained.
 
-```yaml
-services:
-  app:
-    volumes:
-      - /opt/acg-faka-plugin/app/Controller/User/Api/PolyPayNotification.php:/var/www/html/app/Controller/User/Api/PolyPayNotification.php:ro
-```
+## Marketplace delivery
 
-Retain the original Compose files and environment file when applying this override. Do not rely on `docker cp` into the app container for the controller: it would disappear on recreation. This deployment changes container mounts and adds plugin files; it does not edit the host source repository or alter database structure.
+Register two store entries: payment extension `PolyPay` (type 1) and general extension `PolyPayCallback` (type 0). The packaging script emits install/update archives for each, plus manual install/update bundles. Store archives start at `Config/`; update archives omit configuration to preserve settings. Install defaults are generated instead of reading local configuration. See [MARKETPLACE.md](MARKETPLACE.md) for archive names, submission preparation and migration. Actual store submission and review have not been performed.
 
 ## Payment integrity
 
@@ -58,6 +53,8 @@ The `AC...` merchant order ID is available in PolyPay's order details; it is not
 ```bash
 php tests/run.php
 php tests/controller.php  # PHP 8+ host HTTP boundary tests
+php tests/trade.php
+python3 tests/package.py  # extraction, update preservation and secret exclusion
 python3 scripts/package.py
 ```
 

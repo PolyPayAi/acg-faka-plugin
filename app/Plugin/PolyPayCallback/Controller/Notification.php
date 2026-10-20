@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace App\Controller\User\Api;
+namespace App\Plugin\PolyPayCallback\Controller;
 
 use App\Controller\Base\API\User;
 use App\Interceptor\Waf;
@@ -11,7 +11,7 @@ use Kernel\Context\Interface\Request;
 use Kernel\Util\Context;
 
 #[Interceptor(Waf::class, Interceptor::TYPE_API)]
-class PolyPayNotification extends User
+class Notification extends User
 {
     #[Inject]
     private \App\Service\Order $order;
