@@ -15,7 +15,7 @@ with tempfile.TemporaryDirectory() as work:
     # Build from a temporary source tree containing a deliberately poisoned config.
     import shutil
     source = work / 'source'
-    for path in ('app',):
+    for path in ('app', 'skills'):
         shutil.copytree(ROOT / path, source / path)
     for name in ('README.md', 'README.zh.md', 'LICENSE', 'MARKETPLACE.md'):
         shutil.copyfile(ROOT / name, source / name)
@@ -31,6 +31,7 @@ with tempfile.TemporaryDirectory() as work:
     for item in manifest['packages']:
         with ZipFile(work / 'dist' / item['file']) as archive:
             assert all(secret.encode() not in archive.read(n) for n in archive.namelist())
+            assert 'skills/polypay-acg-faka/SKILL.md' in archive.namelist()
             assert all(not n.startswith('/') and '..' not in Path(n).parts for n in archive.namelist())
             if item['type'] is None:
                 assert 'app/Pay/PolyPay/Impl/Pay.php' in archive.namelist()

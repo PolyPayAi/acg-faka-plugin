@@ -1,5 +1,29 @@
 # ACG-Faka 的 PolyPay 支付插件
 
+## AI 接入（Skill）
+
+提供 [polypay-acg-faka skill](skills/polypay-acg-faka/SKILL.md)，可让 Codex 协助安装、配置、升级及排错。会同时安装 PolyPay 支付模块和 PolyPayCallback 回调模块。
+
+使用 Codex 自带的 skill 安装器安装：
+
+```bash
+python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-installer/scripts/install-skill-from-github.py" \
+  --repo PolyPayAi/acg-faka-plugin \
+  --ref feat/standalone-payments \
+  --path skills/polypay-acg-faka
+```
+
+当前发布在 `feat/standalone-payments`，请保留 `--ref` 参数。若已安装同名 skill，先核对现有版本再更新。安装后下一轮对话可这样调用，将路径换成实际值：
+
+```text
+$polypay-acg-faka
+在 /path/to/acg-faka 安装并配置 PolyPay，插件源码在 /path/to/acg-faka-plugin。商户凭据从我指定的私有文件读取。启用支付和回调两个模块，导入面板语言包，验证建单和取消，不进行实际付款。
+```
+
+使用其他 AI 工具时，可让它先读取上述 `SKILL.md` 再执行接入。安装 skill 只添加操作指引，不会自动修改或部署商城。
+
+## 插件概览
+
 新增 `app/Pay/PolyPay/` 支付模块及 `app/Plugin/PolyPayCallback/` 回调模块，不修改宿主已有文件、路由配置和数据库结构。支付后继续由宿主原生逻辑发货和充值。
 
 版本：**0.2.0 预览版；适配器测试已通过，尚待真实宿主验收。** 当前核对基准：ACG-Faka `ea4f4e6`（3.8.4）。完整说明见 [README](README.md)。

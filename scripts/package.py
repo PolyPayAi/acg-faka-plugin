@@ -57,6 +57,8 @@ def build(output_dir=None):
                     entries[name] = b"<?php\nreturn ['STATUS' => 0];\n" if directory == CALLBACK else b"<?php\nreturn [];\n"
             for name in ('LICENSE', 'README.md', 'README.zh.md', 'MARKETPLACE.md'):
                 entries[name] = (ROOT / name).read_bytes()
+            skill = Path('skills/polypay-acg-faka/SKILL.md')
+            entries[skill.as_posix()] = (ROOT / skill).read_bytes()
             output = output_dir / f'acg-faka-polypay-{version}-{label}-{mode}.zip'
             with ZipFile(output, 'w', ZIP_DEFLATED) as archive:
                 for name, data in sorted(entries.items()):
