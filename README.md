@@ -12,7 +12,7 @@ Paste this prompt into your AI coding tool (Claude Code, Cursor, Codex, etc.):
 
 ```text
 Install and use the PolyPay integration Skill for ACG-Faka:
-https://github.com/PolyPayAi/acg-faka-plugin/tree/feat/standalone-payments/skills/polypay-acg-faka
+https://github.com/PolyPayAi/acg-faka-plugin/tree/master/skills/polypay-acg-faka
 
 Then integrate PolyPay payments into this ACG-Faka project, configure the payment and callback plugins, and verify checkout creation and cancellation.
 ```

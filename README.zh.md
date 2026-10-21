@@ -12,7 +12,7 @@
 
 ```text
 请安装并使用 ACG-Faka 的 PolyPay 接入 Skill：
-https://github.com/PolyPayAi/acg-faka-plugin/tree/feat/standalone-payments/skills/polypay-acg-faka
+https://github.com/PolyPayAi/acg-faka-plugin/tree/master/skills/polypay-acg-faka
 
 然后为当前 ACG-Faka 项目接入 PolyPay 支付，配置支付和回调插件，完成建单、取消验证。
 ```

@@ -9,7 +9,7 @@ Integrate through the host payment-extension and companion-plugin mechanisms. Bo
 
 ## Locate the maintained source
 
-Use the user's plugin checkout and host installation. If source is absent, retrieve `https://github.com/PolyPayAi/acg-faka-plugin` into a new task directory. This integration and skill are currently published on `feat/standalone-payments`; inspect refs rather than assuming the default branch. Do not overwrite a populated directory.
+Use the user's plugin checkout and host installation. If source is absent, retrieve `https://github.com/PolyPayAi/acg-faka-plugin` into a new task directory. This integration and skill are maintained on `master`; inspect the current repository documentation before selecting a revision. Do not overwrite a populated directory.
 
 Paths below are relative to the **plugin source checkout**, not this installed skill. Read its `README.md` or `README.zh.md` for the supported host version and deployment instructions. Read `MARKETPLACE.md` only for store packages or their update layout. Inspect the actual host revision and any local instructions; forks are not automatically compatible.
 
